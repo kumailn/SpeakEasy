@@ -323,7 +323,7 @@ export default {
                               navigator.webkitGetUserMedia ||
                               navigator.mozGetUserMedia    ||
                               null;*/
-            navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
+            //navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
         },
     },
 };
