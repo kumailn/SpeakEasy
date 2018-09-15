@@ -7,9 +7,14 @@
             <apexcharts width="100%" type="area" :options="options" :series="series" height="400px"></apexcharts>
           </v-card>
         </v-flex>
-        <v-flex v-for="i in 2" :key="`6${i}`" xs6>
+        <v-flex xs6>
           <v-card dark color="secondary">
-            <v-btn @click="addData">add data</v-btn>
+            <v-btn @click="updateEmotionBreakdown">add data</v-btn>
+          </v-card>
+        </v-flex>
+        <v-flex xs6>
+          <v-card>
+            <apexcharts width="100%" type="radialBar" :options="emotionBreakdown" :series="emotionBreakdown.series" height="400px"></apexcharts>
           </v-card>
         </v-flex>
         <v-flex v-for="i in 3" :key="`4${i}`" xs4>
@@ -59,6 +64,34 @@ export default {
     },
     data() {
         return {
+            emotionBreakdown: {
+                chart: {
+                    height: 380,
+                    type: 'radialBar',
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                        animateGradually: {
+                            enabled: true,
+                            delay: 300,
+                        },
+                        dynamicAnimation: {
+                            enabled: false,
+                            speed: 500,
+                        },
+                    },
+                },
+                plotOptions: {
+                    circle: {
+                        dataLabels: {
+                            showOn: 'hover',
+                        },
+                    },
+                },
+                series: [44, 55, 67, 83],
+                labels: ['Apples', 'Oranges', 'Bananas', 'Berries'],
+            },
             options: {
                 chart: {
                     id: 'vuechart-example',
@@ -100,6 +133,13 @@ export default {
 
             this.series[0].data.shift();
             this.options.xaxis.categories.shift();
+        },
+        updateEmotionBreakdown() {
+            let n = [];
+            for (let i = 0; i < 4; i++) {
+                n.push(Math.floor(Math.random() * 100));
+            }
+            this.emotionBreakdown.series = n;
         },
     },
 };
