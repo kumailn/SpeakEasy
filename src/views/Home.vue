@@ -32,7 +32,7 @@
             <div id="container">
               <video autoplay="true" id="videoElement" style="width: 100%; height: 100%;" />
             </div>
-            <button id="screenshotButton"> Take a Screenshot </button>
+            <button id="screenshotButton" @click="callBackend"> Take a Screenshot </button>
           </v-card>
         </v-flex>
         <v-flex xs4>
@@ -76,6 +76,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <script>
 import VueApexCharts from 'vue-apexcharts';
+import FormData from 'form-data';
 import axios from 'axios';
 import db from '../private';
 
@@ -224,18 +225,6 @@ export default {
                 });
         }
 
-        const canvas = document.createElement('canvas');
-        const screenshotButton = document.querySelector('#screenshotButton');
-
-        screenshotButton.onclick = video.onclick = function() {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            // Other browsers will fall back to image/png
-            var img = canvas.toDataURL('image/png');
-            console.log('Image taken!' + img);
-        };
-
         // window.setInterval(this.addData(), 1000);
     },
     methods: {
@@ -251,7 +240,29 @@ export default {
             }
         },
         async callBackend() {
-            const response = await axios.post('http://127.0.0.1:5000/messages');
+            const video = document.querySelector('#videoElement');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            // Other browsers will fall back to image/png
+            var img = canvas.toDataURL('image/png');
+
+            let data = new FormData();
+            data.append('audience_image', img, 'myimage1');
+            console.log('data', data);
+            console.log('Image taken!' + img);
+            try {
+                const response = await axios.post('http://127.0.0.1:5000/messages', data, {
+                    headers: {
+                        accept: 'application/json',
+                        'Accept-Language': 'en-US,en;q=0.8',
+                    },
+                });
+                console.log(response.data);
+            } catch (err) {
+                console.log('Error with axios post file: ', err);
+            }
         },
         addData() {
             this.options.xaxis.categories.push(Math.floor(Math.random() * 100));

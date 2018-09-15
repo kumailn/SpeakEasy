@@ -169,7 +169,6 @@ def api_messages():
         data1['smiles_incrowd_pct'] = smiles_incrowd_pct
         data1['males_incrowd_pct'] = male_pct
         data1['avg_age_incrowd'] = avg_age
-
         data1['forehead_covered_pct'] = forehead_covered_pct
         data1['eye_covered_pct'] = eye_covered_pct
         data1['mouth_covered_pct'] = mouth_covered_pct
