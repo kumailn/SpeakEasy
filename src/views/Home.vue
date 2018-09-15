@@ -10,7 +10,7 @@
         <v-flex xs6>
           <v-card dark color="secondary">
             <div id="container">
-              <video autoplay="true" id="videoElement" />
+              <video autoplay="true" id="videoElement" style="width:100%; height: 100%" />
             </div>
           </v-card>
         </v-flex>
