@@ -2,9 +2,29 @@
   <v-container fluid>
     <v-container grid-list-md text-xs-center>
       <v-layout row wrap>
-        <v-flex xs12>
+        <v-flex xs8>
           <v-card>
             <apexcharts width="100%" type="area" :options="options" :series="series" height="400px"></apexcharts>
+          </v-card>
+        </v-flex>
+        <v-flex xs4>
+          <v-card id="aud">
+            <svg preserveAspectRatio="none" id="visualizer" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+              <defs>
+                <mask id="mymask">
+                  <g id="maskGroup">
+                  </g>
+                </mask>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#ff0a0a;stop-opacity:1" />
+                  <stop offset="20%" style="stop-color:#f1ff0a;stop-opacity:1" />
+                  <stop offset="90%" style="stop-color:#d923b9;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#050d61;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="100%" height="100%" fill="url(#gradient)" mask="url(#mymask)"></rect>
+            </svg>
+            <h1>In</h1>
           </v-card>
         </v-flex>
         <v-flex xs4>
@@ -12,6 +32,7 @@
             <div id="container">
               <video autoplay="true" id="videoElement" style="width: 100%; height: 100%;" />
             </div>
+            <button id="screenshotButton"> Take a Screenshot </button>
           </v-card>
         </v-flex>
         <v-flex xs4>
@@ -55,7 +76,9 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <script>
 import VueApexCharts from 'vue-apexcharts';
+import axios from 'axios';
 import db from '../private';
+
 export default {
     components: {
         apexcharts: VueApexCharts,
@@ -177,7 +200,7 @@ export default {
         };
     },
     async beforeMount() {
-        let res = await db
+        const res = await db
             .collection('sessions')
             .doc('1')
             .get();
@@ -186,6 +209,8 @@ export default {
         this.emotionBreakdown.labels = res.data().chartData.emotionBreakdown.labels;
     },
     mounted() {
+        this.visiualizeAudio();
+        this.newFirebaseSession();
         const video = document.querySelector('#videoElement');
 
         if (navigator.mediaDevices.getUserMedia) {
@@ -198,9 +223,36 @@ export default {
                     console.log('Something went wrong!');
                 });
         }
+
+        const canvas = document.createElement('canvas');
+        const screenshotButton = document.querySelector('#screenshotButton');
+
+        screenshotButton.onclick = video.onclick = function() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            // Other browsers will fall back to image/png
+            var img = canvas.toDataURL('image/png');
+            console.log('Image taken!' + img);
+        };
+
         // window.setInterval(this.addData(), 1000);
     },
     methods: {
+        async newFirebaseSession() {
+            try {
+                const response = await db
+                    .collection('sessions')
+                    .doc((new Date() * 1000).toString())
+                    .set({ suhbruh: 'ssss' });
+                console.log('fb success');
+            } catch (err) {
+                console.log('Error updating firebase: ', err);
+            }
+        },
+        async callBackend() {
+            const response = await axios.post('http://127.0.0.1:5000/messages');
+        },
         addData() {
             this.options.xaxis.categories.push(Math.floor(Math.random() * 100));
             this.series[0].data.push(Math.floor(Math.random() * 100));
@@ -214,6 +266,62 @@ export default {
                 n.push(Math.floor(Math.random() * 100));
             }
             this.emotionBreakdown.series = n;
+        },
+        visiualizeAudio() {
+            var paths = document.getElementById('aud').getElementsByTagName('path');
+            var visualizer = document.getElementById('visualizer');
+            var mask = visualizer.getElementById('mymask');
+            var h = document.getElementsByTagName('h1')[0];
+            var path;
+            var report = 0;
+            console.log('suhhhhhhhhh', paths);
+            var soundAllowed = function(stream) {
+                //Audio stops listening in FF without // window.persistAudioStream = stream;
+                //https://bugzilla.mozilla.org/show_bug.cgi?id=965483
+                //https://support.mozilla.org/en-US/questions/984179
+                window.persistAudioStream = stream;
+                h.innerHTML = 'Thanks';
+                h.setAttribute('style', 'opacity: 0;');
+                var audioContent = new AudioContext();
+                var audioStream = audioContent.createMediaStreamSource(stream);
+                var analyser = audioContent.createAnalyser();
+                audioStream.connect(analyser);
+                analyser.fftSize = 1024;
+
+                var frequencyArray = new Uint8Array(analyser.frequencyBinCount);
+                visualizer.setAttribute('viewBox', '0 0 255 255');
+
+                //Through the frequencyArray has a length longer than 255, there seems to be no
+                //significant data after this point. Not worth visualizing.
+                for (var i = 0; i < 255; i++) {
+                    path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('stroke-dasharray', '4,1');
+                    mask.appendChild(path);
+                }
+                var doDraw = function() {
+                    requestAnimationFrame(doDraw);
+                    analyser.getByteFrequencyData(frequencyArray);
+                    var adjustedLength;
+                    for (var i = 0; i < 255; i++) {
+                        adjustedLength =
+                            Math.floor(frequencyArray[i]) - Math.floor(frequencyArray[i]) % 5;
+                        paths[i].setAttribute('d', 'M ' + i + ',255 l 0,-' + adjustedLength);
+                    }
+                };
+                doDraw();
+            };
+
+            var soundNotAllowed = function(error) {
+                h.innerHTML = 'You must allow your microphone.';
+                console.log(error);
+            };
+
+            /*window.navigator = window.navigator || {};
+    /*navigator.getUserMedia =  navigator.getUserMedia       ||
+                              navigator.webkitGetUserMedia ||
+                              navigator.mozGetUserMedia    ||
+                              null;*/
+            navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
         },
     },
 };
@@ -234,5 +342,48 @@ li {
 }
 a {
     color: #42b983;
+}
+
+#aud {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: white;
+    font-size: 0;
+}
+
+svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+}
+
+h1 {
+    width: 100%;
+    font-family: sans-serif;
+    position: absolute;
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    top: 40%;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+    -moz-transition: opacity 1s ease-in-out;
+    -webkit-transition: opacity 1s ease-in-out;
+}
+
+h1 a {
+    color: #48b1f4;
+    text-decoration: none;
+}
+
+#aud path {
+    stroke-linecap: square;
+    stroke: white;
+    stroke-width: 0.5px;
 }
 </style>
