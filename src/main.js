@@ -5,7 +5,7 @@ import router from './router';
 import store from './store';
 import Trend from 'vuetrend';
 import VueApexCharts from 'vue-apexcharts';
- 
+
 Vue.use(VueApexCharts);
 Vue.use(Trend);
 Vue.config.productionTip = false;

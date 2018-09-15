@@ -48,7 +48,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <script>
 import VueApexCharts from 'vue-apexcharts';
-
+import db from '../private';
 export default {
     components: {
         apexcharts: VueApexCharts,
@@ -80,8 +80,8 @@ export default {
                         },
                     },
                 },
-                series: [44, 55, 67, 83],
-                labels: ['Apples', 'Oranges', 'Bananas', 'Berries'],
+                series: [],
+                labels: [],
             },
             options: {
                 chart: {
@@ -114,20 +114,29 @@ export default {
             ],
         };
     },
+    async beforeMount() {
+        let res = await db
+            .collection('sessions')
+            .doc('1')
+            .get();
+        console.log(res.data());
+        this.emotionBreakdown.series = res.data().chartData.emotionBreakdown.series;
+        this.emotionBreakdown.labels = res.data().chartData.emotionBreakdown.labels;
+    },
     mounted() {
-        var video = document.querySelector('#videoElement');
+        const video = document.querySelector('#videoElement');
 
         if (navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices
                 .getUserMedia({ video: true })
-                .then(function(stream) {
+                .then(stream => {
                     video.srcObject = stream;
                 })
-                .catch(function(err0r) {
+                .catch(err0r => {
                     console.log('Something went wrong!');
                 });
         }
-        //window.setInterval(this.addData(), 1000);
+        // window.setInterval(this.addData(), 1000);
     },
     methods: {
         addData() {
@@ -138,7 +147,7 @@ export default {
             this.options.xaxis.categories.shift();
         },
         updateEmotionBreakdown() {
-            let n = [];
+            const n = [];
             for (let i = 0; i < 4; i++) {
                 n.push(Math.floor(Math.random() * 100));
             }

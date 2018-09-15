@@ -50,23 +50,23 @@
 
 <script>
 export default {
-    name: 'App',
-    data() {
-        return {
-            clipped: false,
-            drawer: false,
-            fixed: false,
-            items: [
-                {
-                    icon: 'bubble_chart',
-                    title: 'Inspire',
-                },
-            ],
-            miniVariant: false,
-            right: true,
-            rightDrawer: false,
-            title: 'HTN 2018',
-        };
-    },
+  name: 'App',
+  data() {
+    return {
+      clipped: false,
+      drawer: false,
+      fixed: false,
+      items: [
+        {
+          icon: 'bubble_chart',
+          title: 'Inspire',
+        },
+      ],
+      miniVariant: false,
+      right: true,
+      rightDrawer: false,
+      title: 'HTN 2018',
+    };
+  },
 };
 </script>
