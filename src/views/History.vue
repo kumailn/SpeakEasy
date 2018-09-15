@@ -49,111 +49,112 @@
 <script>
 import VueApexCharts from 'vue-apexcharts';
 import db from '../private';
+
 export default {
-    components: {
-        apexcharts: VueApexCharts,
-    },
-    data() {
-        return {
-            emotionBreakdown: {
-                chart: {
-                    height: 380,
-                    type: 'radialBar',
-                    animations: {
-                        enabled: true,
-                        easing: 'easeinout',
-                        speed: 800,
-                        animateGradually: {
-                            enabled: true,
-                            delay: 300,
-                        },
-                        dynamicAnimation: {
-                            enabled: false,
-                            speed: 500,
-                        },
-                    },
-                },
-                plotOptions: {
-                    circle: {
-                        dataLabels: {
-                            showOn: 'hover',
-                        },
-                    },
-                },
-                series: [],
-                labels: [],
+  components: {
+    apexcharts: VueApexCharts,
+  },
+  data() {
+    return {
+      emotionBreakdown: {
+        chart: {
+          height: 380,
+          type: 'radialBar',
+          animations: {
+            enabled: true,
+            easing: 'easeinout',
+            speed: 800,
+            animateGradually: {
+              enabled: true,
+              delay: 300,
             },
-            options: {
-                chart: {
-                    id: 'vuechart-example',
-                },
-                xaxis: {
-                    categories: [
-                        1991,
-                        1992,
-                        1993,
-                        1994,
-                        1995,
-                        1996,
-                        1997,
-                        1998,
-                        423,
-                        543,
-                        653,
-                        6543,
-                        645,
-                        234,
-                    ],
-                },
+            dynamicAnimation: {
+              enabled: false,
+              speed: 500,
             },
-            series: [
-                {
-                    name: 'series-1',
-                    data: [30, 40, 45, 50, 49, 60, 70, 91, 34, 53, 54, 77, 33, 11, 88, 66],
-                },
-            ],
-        };
-    },
-    async beforeMount() {
-        let res = await db
-            .collection('sessions')
-            .doc('1')
-            .get();
-        console.log(res.data());
-        this.emotionBreakdown.series = res.data().chartData.emotionBreakdown.series;
-        this.emotionBreakdown.labels = res.data().chartData.emotionBreakdown.labels;
-    },
-    mounted() {
-        const video = document.querySelector('#videoElement');
-
-        if (navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices
-                .getUserMedia({ video: true })
-                .then(stream => {
-                    video.srcObject = stream;
-                })
-                .catch(err0r => {
-                    console.log('Something went wrong!');
-                });
-        }
-        // window.setInterval(this.addData(), 1000);
-    },
-    methods: {
-        addData() {
-            this.options.xaxis.categories.push(Math.floor(Math.random() * 100));
-            this.series[0].data.push(Math.floor(Math.random() * 100));
-
-            this.series[0].data.shift();
-            this.options.xaxis.categories.shift();
+          },
         },
-        updateEmotionBreakdown() {
-            const n = [];
-            for (let i = 0; i < 4; i++) {
-                n.push(Math.floor(Math.random() * 100));
-            }
-            this.emotionBreakdown.series = n;
+        plotOptions: {
+          circle: {
+            dataLabels: {
+              showOn: 'hover',
+            },
+          },
         },
+        series: [],
+        labels: [],
+      },
+      options: {
+        chart: {
+          id: 'vuechart-example',
+        },
+        xaxis: {
+          categories: [
+            1991,
+            1992,
+            1993,
+            1994,
+            1995,
+            1996,
+            1997,
+            1998,
+            423,
+            543,
+            653,
+            6543,
+            645,
+            234,
+          ],
+        },
+      },
+      series: [
+        {
+          name: 'series-1',
+          data: [30, 40, 45, 50, 49, 60, 70, 91, 34, 53, 54, 77, 33, 11, 88, 66],
+        },
+      ],
+    };
+  },
+  async beforeMount() {
+    const res = await db
+      .collection('sessions')
+      .doc('1')
+      .get();
+    console.log(res.data());
+    this.emotionBreakdown.series = res.data().chartData.emotionBreakdown.series;
+    this.emotionBreakdown.labels = res.data().chartData.emotionBreakdown.labels;
+  },
+  mounted() {
+    const video = document.querySelector('#videoElement');
+
+    if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((err0r) => {
+          console.log('Something went wrong!');
+        });
+    }
+    // window.setInterval(this.addData(), 1000);
+  },
+  methods: {
+    addData() {
+      this.options.xaxis.categories.push(Math.floor(Math.random() * 100));
+      this.series[0].data.push(Math.floor(Math.random() * 100));
+
+      this.series[0].data.shift();
+      this.options.xaxis.categories.shift();
     },
+    updateEmotionBreakdown() {
+      const n = [];
+      for (let i = 0; i < 4; i++) {
+        n.push(Math.floor(Math.random() * 100));
+      }
+      this.emotionBreakdown.series = n;
+    },
+  },
 };
 </script>
 
