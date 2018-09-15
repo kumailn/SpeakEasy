@@ -32,6 +32,7 @@
             <div id="container">
               <video autoplay="true" id="videoElement" style="width: 100%; height: 100%;" />
             </div>
+            <button id="screenshotButton"> Take a Screenshot </button>
           </v-card>
         </v-flex>
         <v-flex xs4>
@@ -222,6 +223,19 @@ export default {
                     console.log('Something went wrong!');
                 });
         }
+
+        const canvas = document.createElement('canvas');
+        const screenshotButton = document.querySelector('#screenshotButton');
+
+        screenshotButton.onclick = video.onclick = function() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            // Other browsers will fall back to image/png
+            var img = canvas.toDataURL('image/png');
+            console.log('Image taken!' + img);
+        };
+
         // window.setInterval(this.addData(), 1000);
     },
     methods: {
