@@ -13,6 +13,8 @@
               <video autoplay="true" id="videoElement" style="width: 100%; height: 100%;" />
             </div>
             <button id="screenshotButton"> Take a Screenshot </button>
+            </br>
+            <button id="recordButton"> Record </button>
           </v-card>
         </v-flex>
         <v-flex xs4>
