@@ -7,47 +7,47 @@
             <apexcharts width="100%" type="area" :options="options" :series="series" height="400px"></apexcharts>
           </v-card>
         </v-flex>
-        <v-flex xs6>
+        <v-flex xs4>
           <v-card dark color="secondary">
             <div id="container">
-              <video autoplay="true" id="videoElement" style="width:100%; height: 100%" />
+              <video autoplay="true" id="videoElement" style="width: 100%; height: 100%;" />
             </div>
           </v-card>
         </v-flex>
-        <v-flex v-for="i in 3" :key="`4${i}`" xs4>
-          <v-card dark color="primary">
+        <v-flex v-for="i in 2" :key="`4${i}`" xs4>
+          <v-card>
             <v-card-text class="px-0">
-              <apexcharts width="100%" type="radialBar" :options="emotionBreakdown" :series="emotionBreakdown.series" height="400px"></apexcharts>
+              <apexcharts width="100%" type="radialBar" :options="emotionBreakdown" :series="emotionBreakdown.series" height="390px" />
             </v-card-text>
           </v-card>
         </v-flex>
-        <v-flex v-for="i in 4" :key="`3${i}`" xs3>
-          <v-card dark color="secondary">
-            <v-card-text class="px-0">3</v-card-text>
+        <v-flex v-for="i in 4 " :key="`3${i}` " xs3>
+          <v-card dark color="secondary ">
+            <v-card-text class="px-0 ">3</v-card-text>
           </v-card>
         </v-flex>
-        <v-flex v-for="i in 6" :key="`2${i}`" xs2>
-          <v-card dark color="primary">
-            <v-card-text class="px-0">2</v-card-text>
+        <v-flex v-for="i in 6 " :key="`2${i}` " xs2>
+          <v-card dark color="primary ">
+            <v-card-text class="px-0 ">2</v-card-text>
           </v-card>
         </v-flex>
-        <v-flex v-for="i in 12" :key="`1${i}`" xs1>
-          <v-card dark color="secondary">
-            <v-card-text class="px-0">1</v-card-text>
+        <v-flex v-for="i in 12 " :key="`1${i}` " xs1>
+          <v-card dark color="secondary ">
+            <v-card-text class="px-0 ">1</v-card-text>
           </v-card>
         </v-flex>
       </v-layout>
     </v-container>
     <v-layout align-center justify-space-around row fill-height>
-      <apexcharts width="1000px" type="line" :options="options" :series="series" height="400px"></apexcharts>
-      <apexcharts width="600px" type="line" :options="options" :series="series" height="400px"></apexcharts>
+      <apexcharts width="1000px " type="line " :options="options " :series="series " height="400px "></apexcharts>
+      <apexcharts width="600px " type="line " :options="options " :series="series " height="400px "></apexcharts>
     </v-layout>
     <v-layout align-center justify-space-around row fill-height>
-      <v-btn @click="addData">add data</v-btn>
-      <apexcharts width="300px" type="radialBar" :options="options" :series="series" height="400px"></apexcharts>
+      <v-btn @click="addData ">add data</v-btn>
+      <apexcharts width="300px " type="radialBar " :options="options " :series="series " height="400px "></apexcharts>
     </v-layout>
 
-    <v-slide-y-transition mode="out-in">
+    <v-slide-y-transition mode="out-in ">
 
     </v-slide-y-transition>
   </v-container>
