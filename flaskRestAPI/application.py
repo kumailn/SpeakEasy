@@ -35,7 +35,8 @@ def api_messages():
         # this region.
         face_api_url = 'https://canadacentral.api.cognitive.microsoft.com/face/v1.0/detect'
         # Set image_url to the URL of an image that you want to analyze.
-        image_url = 'crowd.jpg'
+        image_url = f.filename
+        print(f.filename)
         headers = {'Content-Type': 'application/octet-stream',
                    'Ocp-Apim-Subscription-Key': subscription_key}
         params = {
