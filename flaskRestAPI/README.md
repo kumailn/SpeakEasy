@@ -1,9 +1,7 @@
-# Python Flask app on Azure Web App for Containers
+To Test:
 
-This is a minimal sample app that demonstrates how to run a Python Flask application on Azure App Service on Linux.
+In bash, run:
 
-For more information, please see the [Python on App Service quickstart](https://docs.microsoft.com/en-us/azure/app-service/containers/quickstart-python).
-
-# Contributing
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+1) python3 application.py
+2) curl -F "audience_image=@me.jpg" http://127.0.0.1:5000/messages
+3) "testme.jpg" should now be in the folder
