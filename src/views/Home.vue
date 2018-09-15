@@ -1,35 +1,124 @@
 <template>
   <v-container fluid>
-    <v-slide-y-transition mode="out-in">
-      <v-layout column align-center>
-        <img src="@/assets/logo.png" alt="Vuetify.js" class="mb-5">
-        <blockquote>
-          &#8220;First, solve the problem. Then, write the code.&#8221;
-          <footer>
-            <small>
-              <em>&mdash;John Johnson</em>
-            </small>
-          </footer>
-        </blockquote>
+    <v-container grid-list-md text-xs-center>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-card>
+            <apexcharts width="100%" type="area" :options="options" :series="series" height="400px"></apexcharts>
+          </v-card>
+        </v-flex>
+        <v-flex v-for="i in 2" :key="`6${i}`" xs6>
+          <v-card dark color="secondary">
+            <v-btn @click="addData">add data</v-btn>
+          </v-card>
+        </v-flex>
+        <v-flex v-for="i in 3" :key="`4${i}`" xs4>
+          <v-card dark color="primary">
+            <v-card-text class="px-0">4</v-card-text>
+          </v-card>
+        </v-flex>
+        <v-flex v-for="i in 4" :key="`3${i}`" xs3>
+          <v-card dark color="secondary">
+            <v-card-text class="px-0">3</v-card-text>
+          </v-card>
+        </v-flex>
+        <v-flex v-for="i in 6" :key="`2${i}`" xs2>
+          <v-card dark color="primary">
+            <v-card-text class="px-0">2</v-card-text>
+          </v-card>
+        </v-flex>
+        <v-flex v-for="i in 12" :key="`1${i}`" xs1>
+          <v-card dark color="secondary">
+            <v-card-text class="px-0">1</v-card-text>
+          </v-card>
+        </v-flex>
       </v-layout>
+    </v-container>
+    <v-layout align-center justify-space-around row fill-height>
+      <apexcharts width="1000px" type="line" :options="options" :series="series" height="400px"></apexcharts>
+      <apexcharts width="600px" type="line" :options="options" :series="series" height="400px"></apexcharts>
+    </v-layout>
+    <v-layout align-center justify-space-around row fill-height>
+      <v-btn @click="addData">add data</v-btn>
+      <apexcharts width="300px" type="radialBar" :options="options" :series="series" height="400px"></apexcharts>
+    </v-layout>
+
+    <v-slide-y-transition mode="out-in">
+
     </v-slide-y-transition>
   </v-container>
 </template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<script>
+import VueApexCharts from 'vue-apexcharts';
+
+export default {
+    components: {
+        apexcharts: VueApexCharts,
+    },
+    data() {
+        return {
+            options: {
+                chart: {
+                    id: 'vuechart-example',
+                },
+                xaxis: {
+                    categories: [
+                        1991,
+                        1992,
+                        1993,
+                        1994,
+                        1995,
+                        1996,
+                        1997,
+                        1998,
+                        423,
+                        543,
+                        653,
+                        6543,
+                        645,
+                        234,
+                    ],
+                },
+            },
+            series: [
+                {
+                    name: 'series-1',
+                    data: [30, 40, 45, 50, 49, 60, 70, 91, 34, 53, 54, 77, 33, 11, 88, 66],
+                },
+            ],
+        };
+    },
+    mounted() {
+        //window.setInterval(this.addData(), 1000);
+    },
+    methods: {
+        addData() {
+            this.options.xaxis.categories.push(Math.floor(Math.random() * 100));
+            this.series[0].data.push(Math.floor(Math.random() * 100));
+
+            this.series[0].data.shift();
+            this.options.xaxis.categories.shift();
+        },
+    },
+};
+</script>
+
 <style scoped>
-h1, h2 {
-  font-weight: normal;
+h1,
+h2 {
+    font-weight: normal;
 }
 ul {
-  list-style-type: none;
-  padding: 0;
+    list-style-type: none;
+    padding: 0;
 }
 li {
-  display: inline-block;
-  margin: 0 10px;
+    display: inline-block;
+    margin: 0 10px;
 }
 a {
-  color: #42b983;
+    color: #42b983;
 }
 </style>
