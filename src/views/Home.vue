@@ -38,14 +38,6 @@
         </v-flex>
       </v-layout>
     </v-container>
-    <v-layout align-center justify-space-around row fill-height>
-      <apexcharts width="1000px " type="line " :options="options " :series="series " height="400px "></apexcharts>
-      <apexcharts width="600px " type="line " :options="options " :series="series " height="400px "></apexcharts>
-    </v-layout>
-    <v-layout align-center justify-space-around row fill-height>
-      <v-btn @click="addData ">add data</v-btn>
-      <apexcharts width="300px " type="radialBar " :options="options " :series="series " height="400px "></apexcharts>
-    </v-layout>
 
     <v-slide-y-transition mode="out-in ">
 
