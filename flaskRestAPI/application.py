@@ -1,14 +1,17 @@
 from flask import Flask, url_for
 from flask import request
 
-from werkzeug.utils import secure_filename
-
 app = Flask(__name__)
+
+# test route
 
 
 @app.route('/xax')
 def api_root():
     return 'Welcome'
+
+# POST method
+# uses flask request to obtain the file that was POSTed with the audience_image tag
 
 
 @app.route('/messages', methods=['POST'])
