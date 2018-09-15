@@ -2,14 +2,40 @@
   <v-app>
     <v-navigation-drawer persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher fixed app>
       <v-list>
-        <v-list-tile value="true" v-for="(item, i) in items" :key="i">
+        <v-list-tile @click="console.log('suh')">
           <v-list-tile-action>
-            <v-icon v-html="item.icon"></v-icon>
+            <v-icon>home</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title v-text="item.title"></v-list-tile-title>
+            <v-list-tile-title>Home</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile @click="console.log('suh')">
+          <v-list-tile-action>
+            <v-icon>history</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>History</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-group prepend-icon="replay" value="true">
+          <v-list-tile slot="activator">
+            <v-list-tile-title>Recent Sessions</v-list-tile-title>
+          </v-list-tile>
+
+          <v-list-group sub-group no-action v-for="(day, dkey) in days" :key="dkey">
+            <v-list-tile slot="activator">
+              <v-list-tile-title>{{getPrevDay(day)}}</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile v-for="(crud, i) in previousSessions" :key="i" @click="">
+              <v-list-tile-title v-text="crud"></v-list-tile-title>
+              <v-list-tile-action>
+                <v-icon></v-icon>
+              </v-list-tile-action>
+            </v-list-tile>
+          </v-list-group>
+        </v-list-group>
+
       </v-list>
     </v-navigation-drawer>
     <v-toolbar app :clipped-left="clipped">
@@ -51,8 +77,34 @@
 <script>
 export default {
   name: 'App',
+  methods: {
+    getPrevDay(num) {
+      if (num === 0) return 'Yesterday';
+      const d = new Date();
+      d.setDate(d.getDate() - num);
+      console.log(num, d.getDay());
+      return this.weekdays[d.getDay()];
+    },
+  },
   data() {
     return {
+      weekdays: [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ],
+      days: [0, 1, 2, 3, 4, 5],
+      previousSessions: ['1:20pm', '2:30pm', '7:15pm'],
+      cruds: [
+        ['Create', 'add'],
+        ['Read', 'insert_drive_file'],
+        ['Update', 'update'],
+        ['Delete', 'delete'],
+      ],
       clipped: false,
       drawer: false,
       fixed: false,
