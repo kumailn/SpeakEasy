@@ -9,7 +9,11 @@
         </v-flex>
         <v-flex v-for="i in 2" :key="`6${i}`" xs6>
           <v-card dark color="secondary">
-            <v-btn @click="addData">add data</v-btn>
+            <div id="container">
+             <video autoplay="true" id="videoElement">
+     
+             </video>
+            </div>
           </v-card>
         </v-flex>
         <v-flex v-for="i in 3" :key="`4${i}`" xs4>
@@ -91,6 +95,17 @@ export default {
         };
     },
     mounted() {
+      var video = document.querySelector("#videoElement");
+ 
+if (navigator.mediaDevices.getUserMedia) {       
+    navigator.mediaDevices.getUserMedia({video: true})
+  .then(function(stream) {
+    video.srcObject = stream;
+  })
+  .catch(function(err0r) {
+    console.log("Something went wrong!");
+  });
+}
         //window.setInterval(this.addData(), 1000);
     },
     methods: {
