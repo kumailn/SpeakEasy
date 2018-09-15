@@ -15,7 +15,7 @@ def api_root():
 def api_messages():
     if 'audience_image' in request.files:
         f = request.files['audience_image']
-        f.save("aaa"+f.filename)
+        f.save("test"+f.filename)
         return "file uploaded"
 
     else:
