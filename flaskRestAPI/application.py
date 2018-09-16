@@ -1,3 +1,5 @@
+from __future__ import division
+
 from flask import Flask, url_for
 from flask import request
 import requests
@@ -7,6 +9,16 @@ from flask_cors import CORS
 from PIL import Image
 from io import BytesIO
 import json
+
+
+import speech_recognition as sr
+import sys
+import os
+import copy
+import json
+# obtain path to "english.wav" in the same folder as this script
+from os import path
+
 
 app = Flask(__name__)
 CORS(app)
@@ -53,7 +65,7 @@ def api_messages():
 
         # print(faces)
 
-        # Emotion scores
+        # Emotion scores initialized
         anger = 0.00
         contempt = 0.00
         disgust = 0.00
@@ -133,29 +145,30 @@ def api_messages():
             else:
                 forehead_true += 1
 
-        total = (anger + contempt + disgust + fear + happiness + neutral + sadness + surprise)
-        if(total == 0): total = 1
+        total = (anger + contempt + disgust + fear +
+                 happiness + neutral + sadness + surprise)
+        if(total == 0):
+            total = 1
 
+        anger_pct = round(anger / total * 100)
+        contempt_pct = round(contempt / total * 100)
+        disgust_pct = round(disgust / total * 100)
+        fear_pct = round(fear / total * 100)
+        happiness_pct = round(happiness / total * 100)
+        neutral_pct = round(neutral / total * 100)
+        sadness_pct = round(sadness / total * 100)
+        surprise_pct = round(surprise / total * 100)
 
-        anger_pct = anger / total * 100
-        contempt_pct = contempt / total * 100
-        disgust_pct = disgust / total * 100
-        fear_pct = fear / total * 100
-        happiness_pct = happiness / total * 100
-        neutral_pct = neutral / total * 100
-        sadness_pct = sadness / total * 100
-        surprise_pct = surprise / total * 100
+        smiles_incrowd_pct = round((smile_count_pos / total) * 100)
 
-        smiles_incrowd_pct = (smile_count_pos / total) * 100
+        male_pct = round((male_count / total) * 100)
+        female_pct = round((female_count / total) * 100)
 
-        male_pct = (male_count / total) * 100
-        female_pct = (female_count / total) * 100
+        avg_age = round(avg_age_intermediate / total)
 
-        avg_age = avg_age_intermediate / total
-
-        eye_covered_pct = (eye_true / total) * 100
-        mouth_covered_pct = (mouth_true / total) * 100
-        forehead_covered_pct = (mouth_true / total) * 100
+        eye_covered_pct = round((eye_true / total) * 100)
+        mouth_covered_pct = round((mouth_true / total) * 100)
+        forehead_covered_pct = round((mouth_true / total) * 100)
         engagement_metric = (1 - (eye_covered_pct * 0.8 + mouth_covered_pct *
                                   0.03 + forehead_covered_pct * 0.12) * 0.95) * 100
 
@@ -184,6 +197,34 @@ def api_messages():
 
     else:
         return "Error has occured"
+
+
+@app.route('/audio', methods=['POST'])
+def api_audio():
+    if request.method == 'POST':
+        # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
+        # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "girl_filler1.wav")
+        AUDIO_FILE = path.join(path.dirname(
+            path.realpath(__file__)), "filler-dave.wav")
+
+        # use audio file as the audio source
+        r = sr.Recognizer()
+        with sr.AudioFile(AUDIO_FILE) as source:
+            audio = r.record(source)  # read the entire audio file
+
+        # STT Microsoft Bing Voice Recognition
+        BING_KEY = "2e41739b91bf4b6e84ad1aa4e9a6030d"
+
+        # STT and preprocessing
+        raw = r.recognize_bing(audio, key=BING_KEY)
+        print(raw)
+        """ 
+        text = raw.split()
+        text = [k.lower() for k in text]
+        print(text)
+
+        text_non_replaced = copy.deepcopy(text) """
+        return "ECHO: POSTED\n"
 
 
 if __name__ == '__main__':
