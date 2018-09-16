@@ -10,6 +10,7 @@ Vue.use(VueApexCharts);
 Vue.use(Trend);
 Vue.config.productionTip = false;
 
+
 new Vue({
   router,
   store,
