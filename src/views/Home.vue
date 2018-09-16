@@ -328,7 +328,7 @@ export default {
             fd.append('voice', audio.audioBlob);
             console.log('fd', fd);
             try {
-                const response = await axios.get('http://127.0.0.1:5000/audio', {
+                const response = await axios.post('http://127.0.0.1:5000/audio', fd, {
                     headers: {
                         accept: 'application/json',
                         'Accept-Language': 'en-US,en;q=0.8',
