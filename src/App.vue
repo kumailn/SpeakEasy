@@ -35,28 +35,19 @@
             </v-list-tile>
           </v-list-group>
         </v-list-group>
-
       </v-list>
     </v-navigation-drawer>
     <v-toolbar app :clipped-left="clipped">
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <!-- <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
-      </v-btn> -->
-      <!-- <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>web</v-icon>
-      </v-btn> -->
-      <!-- <v-btn icon @click.stop="fixed = !fixed">
-        <v-icon>remove</v-icon>
-      </v-btn> -->
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>menu</v-icon>
-      </v-btn> -->
+      <v-toolbar-items class="hidden-sm-and-down">
+        <v-btn flat :color='sessionColor' @click="toggleSession">{{action}} Session {{$store.state.timeElapsed}}</v-btn>
+        <v-btn flat>Logout</v-btn>
+      </v-toolbar-items>
     </v-toolbar>
     <v-content>
-      <router-view/>
+      <router-view />
     </v-content>
     <v-navigation-drawer temporary :right="right" v-model="rightDrawer" fixed app>
       <v-list>
@@ -76,49 +67,97 @@
 
 <script>
 export default {
-  name: 'App',
-  methods: {
-    getPrevDay(num) {
-      if (num === 0) return 'Yesterday';
-      const d = new Date();
-      d.setDate(d.getDate() - num);
-      console.log(num, d.getDay());
-      return this.weekdays[d.getDay()];
-    },
-  },
-  data() {
-    return {
-      weekdays: [
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-      ],
-      days: [0, 1, 2, 3, 4, 5],
-      previousSessions: ['1:20pm', '2:30pm', '7:15pm'],
-      cruds: [
-        ['Create', 'add'],
-        ['Read', 'insert_drive_file'],
-        ['Update', 'update'],
-        ['Delete', 'delete'],
-      ],
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
-        {
-          icon: 'bubble_chart',
-          title: 'Inspire',
+    name: 'App',
+    methods: {
+        getPrevDay(num) {
+            if (num === 0) return 'Yesterday';
+            const d = new Date();
+            d.setDate(d.getDate() - num);
+            return this.weekdays[d.getDay()];
         },
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'HTN 2018',
-    };
-  },
+        toggleSession() {
+            if (!this.inSession) {
+                this.$store.state.inSession = true;
+                this.sessionColor = 'error';
+                this.timer();
+                this.action = 'Stop';
+                this.inSession = true;
+            } else {
+                clearTimeout(this.t);
+                clearInterval(this.$store.state.autoTimerId);
+                this.inSession = false;
+                this.$store.state.inSession = false;
+                this.seconds = 0;
+                this.minutes = 0;
+                this.hours = 0;
+                this.sessionColor = 'success';
+                this.$store.state.timeElapsed = '';
+                this.action = 'Start';
+            }
+        },
+        add() {
+            this.seconds++;
+            if (this.seconds >= 60) {
+                this.seconds = 0;
+                this.minutes++;
+                if (this.minutes >= 60) {
+                    this.minutes = 0;
+                    this.hours++;
+                }
+            }
+            this.$store.state.timeElapsed =
+                (this.hours ? (this.hours > 9 ? this.hours : '0' + this.hours) : '00') +
+                ':' +
+                (this.minutes ? (this.minutes > 9 ? this.minutes : '0' + this.minutes) : '00') +
+                ':' +
+                (this.seconds > 9 ? this.seconds : '0' + this.seconds);
+
+            this.timer();
+        },
+        timer() {
+            this.t = setTimeout(this.add, 1000);
+        },
+    },
+    data() {
+        return {
+            t: null,
+            action: 'Start',
+            seconds: 0,
+            minutes: 0,
+            hours: 0,
+            sessionColor: 'success',
+            inSession: false,
+            weekdays: [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+            ],
+            days: [0, 1, 2, 3, 4, 5],
+            previousSessions: ['1:20pm', '2:30pm', '7:15pm'],
+            cruds: [
+                ['Create', 'add'],
+                ['Read', 'insert_drive_file'],
+                ['Update', 'update'],
+                ['Delete', 'delete'],
+            ],
+            clipped: false,
+            drawer: false,
+            fixed: false,
+            items: [
+                {
+                    icon: 'bubble_chart',
+                    title: 'Inspire',
+                },
+            ],
+            miniVariant: false,
+            right: true,
+            rightDrawer: false,
+            title: 'HTN 2018',
+        };
+    },
 };
 </script>

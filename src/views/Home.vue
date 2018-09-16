@@ -32,7 +32,7 @@
             <div id="container">
               <video autoplay="true" id="videoElement" style="width: 100%; height: 100%;" />
             </div>
-            <button id="screenshotButton"> Take a Screenshot </button>
+            <button id="screenshotButton" @click="callBackend"> Take a Screenshot </button>
             <br/>
             <button id="recordButton"> Record </button>
           </v-card>
@@ -40,7 +40,7 @@
         <v-flex xs4>
           <v-card>
             <v-card-text class="px-0">
-              <apexcharts width="100%" type="radialBar" :options="emotionBreakdown" :series="emotionBreakdown.series" height="390px" />
+              <apexcharts width="100%" type="radialBar" :options="emotionNew" :series="emotionNew.series" height="400px" />
             </v-card-text>
           </v-card>
         </v-flex>
@@ -88,6 +88,62 @@ export default {
     },
     data() {
         return {
+            azureResponse: null,
+            emotionNew: {
+                chart: {
+                    height: 380,
+                    width: 400,
+                    type: 'radialBar',
+                },
+                plotOptions: {
+                    radialBar: {
+                        offsetY: -30,
+                        startAngle: 0,
+                        endAngle: 270,
+                        hollow: {
+                            margin: 5,
+                            size: '30%',
+                            background: 'transparent',
+                            image: undefined,
+                        },
+                        dataLabels: {
+                            name: {
+                                show: false,
+                            },
+                            value: {
+                                show: false,
+                            },
+                        },
+                    },
+                },
+                colors: ['#f45942', '#f47141', '#cb74e8', '#e8d874', '#3ae4ff', '#fffbb2'],
+                series: [76, 67, 61, 90, 44],
+                labels: ['Anger', 'Contempt', 'Disgust', 'Fear', 'Neutral'],
+                legend: {
+                    show: true,
+                    floating: true,
+                    fontSize: '16px',
+                    position: 'left',
+                    verticalAlign: 'top',
+                    textAnchor: 'end',
+                    labels: {
+                        useSeriesColors: true,
+                    },
+                    markers: {
+                        size: 0,
+                    },
+                    formatter: function(seriesName, opts) {
+                        return seriesName + ':  ' + opts.globals.series[opts.seriesIndex];
+                    },
+                    itemMargin: {
+                        vertical: 8,
+                    },
+                    containerMargin: {
+                        left: 180,
+                        top: 8,
+                    },
+                },
+            },
             emotionBreakdown: {
                 chart: {
                     height: 380,
@@ -113,7 +169,7 @@ export default {
                         },
                     },
                 },
-                series: [],
+                series: ['Anger', 'Contempt', 'Disgust', 'Fear', 'Neutral'],
                 labels: [],
             },
             futureChart: {
@@ -176,28 +232,13 @@ export default {
                     id: 'vuechart-example',
                 },
                 xaxis: {
-                    categories: [
-                        1991,
-                        1992,
-                        1993,
-                        1994,
-                        1995,
-                        1996,
-                        1997,
-                        1998,
-                        423,
-                        543,
-                        653,
-                        6543,
-                        645,
-                        234,
-                    ],
+                    categories: [0],
                 },
             },
             series: [
                 {
                     name: 'series-1',
-                    data: [30, 40, 45, 50, 49, 60, 70, 91, 34, 53, 54, 77, 33, 11, 88, 66],
+                    data: [0],
                 },
             ],
         };
@@ -212,6 +253,20 @@ export default {
         this.emotionBreakdown.labels = res.data().chartData.emotionBreakdown.labels;
     },
     mounted() {
+        this.$store.watch(
+            function(state) {
+                return state.inSession;
+            },
+            () => {
+                console.log('STATE CHANGED', this.$store.state.inSession);
+                if (this.$store.state.inSession) {
+                    this.$store.state.autoTimerId = setInterval(() => {
+                        this.callBackend();
+                    }, 1000); //milliseconds
+                }
+            }
+        );
+
         this.visiualizeAudio();
         this.newFirebaseSession();
         const video = document.querySelector('#videoElement');
@@ -242,6 +297,7 @@ export default {
             }
         },
         async callBackend() {
+            console.log('DAFWEFGWG', this.$store.state.timeElapsed);
             const video = document.querySelector('#videoElement');
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
@@ -263,6 +319,8 @@ export default {
                         'Accept-Language': 'en-US,en;q=0.8',
                     },
                 });
+                this.azureResponse = response.data;
+                this.updateAzureData();
                 console.log('AI DATA: ', response.data);
             } catch (err) {
                 console.log('Error with axios post file: ', err);
@@ -274,6 +332,21 @@ export default {
 
             this.series[0].data.shift();
             this.options.xaxis.categories.shift();
+        },
+        updateAzureData() {
+            console.log('foewuhfuiwe');
+            console.log('EMOO', this.azureResponse.neutral);
+            this.series[0].data.push(this.azureResponse.total_ppl);
+            this.emotionNew.series = [
+                this.azureResponse.anger,
+                this.azureResponse.contempt,
+                this.azureResponse.disgust,
+                this.azureResponse.fear,
+                this.azureResponse.neutral,
+            ];
+
+            // this.series[0].data.shift();
+            // this.options.xaxis.categories.shift();
         },
         updateEmotionBreakdown() {
             const n = [];
