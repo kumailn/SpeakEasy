@@ -245,8 +245,8 @@ def api_audio():
         audio.setframerate(8000)
         audio.setnframes(100)
 
-        blob = f.read()  # such as `blob.read()`
-        audio.writeframes(blob)
+        # blob = f.read()  # such as `blob.read()`
+        audio.writeframes(f)
 
         # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
         # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "girl_filler1.wav")
