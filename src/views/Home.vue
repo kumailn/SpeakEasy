@@ -9,22 +9,7 @@
         </v-flex>
         <v-flex xs4>
           <v-card id="aud">
-            <svg preserveAspectRatio="none" id="visualizer" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-              <defs>
-                <mask id="mymask">
-                  <g id="maskGroup">
-                  </g>
-                </mask>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:#ff0a0a;stop-opacity:1" />
-                  <stop offset="20%" style="stop-color:#f1ff0a;stop-opacity:1" />
-                  <stop offset="90%" style="stop-color:#d923b9;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#050d61;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <rect x="0" y="0" width="100%" height="100%" fill="url(#gradient)" mask="url(#mymask)"></rect>
-            </svg>
-            <h1>In</h1>
+            <IOdometer class="iOdometer" :value="totalNumPeople" />
           </v-card>
         </v-flex>
         <v-flex xs4>
@@ -48,7 +33,7 @@
         <v-flex xs4>
           <v-card>
             <v-card-text class="px-0">
-              <apexcharts width="100%" type="line" :options="futureChart" :series="futureChart.series" height="400px" />
+              <apexcharts width="100%" type="line" :options="averageChart" :series="averageChart.series" height="400px" />
             </v-card-text>
           </v-card>
         </v-flex>
@@ -83,13 +68,16 @@ import Recorder from 'recorder-js';
 import FormData from 'form-data';
 import axios from 'axios';
 import db from '../private';
+import IOdometer from 'vue-odometer';
 
 export default {
     components: {
         apexcharts: VueApexCharts,
+        IOdometer,
     },
     data() {
         return {
+            totalNumPeople: 2,
             emoteBar: {
                 chart: {
                     height: 380,
@@ -167,8 +155,8 @@ export default {
                     markers: {
                         size: 0,
                     },
-                    formatter: function(seriesName, opts) {
-                        return seriesName + ':  ' + opts.globals.series[opts.seriesIndex];
+                    formatter(seriesName, opts) {
+                        return `${seriesName}:  ${opts.globals.series[opts.seriesIndex]}`;
                     },
                     itemMargin: {
                         vertical: 8,
@@ -207,57 +195,42 @@ export default {
                 series: ['Anger', 'Contempt', 'Disgust', 'Fear', 'Neutral'],
                 labels: [],
             },
-            futureChart: {
+            averageChart: {
                 chart: {
                     height: 380,
-                    type: 'line',
+                    type: 'column',
                 },
                 series: [
                     {
-                        name: 'Website Blog',
+                        name: 'Average Emotion',
                         type: 'column',
-                        data: [440, 505, 414, 671, 227, 413, 201, 352, 752, 320, 257, 160],
-                    },
-                    {
-                        name: 'Social Media',
-                        type: 'line',
-                        data: [23, 42, 35, 27, 43, 22, 17, 31, 22, 22, 12, 16],
+                        data: [100, 100, 100, 100, 100, 100, 100, 100],
                     },
                 ],
                 stroke: {
                     width: [0, 4],
                 },
                 title: {
-                    text: 'Traffic Sources',
+                    text: 'Average Emotion',
                 },
                 // labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
                 labels: [
-                    '01 Jan 2001',
-                    '02 Jan 2001',
-                    '03 Jan 2001',
-                    '04 Jan 2001',
-                    '05 Jan 2001',
-                    '06 Jan 2001',
-                    '07 Jan 2001',
-                    '08 Jan 2001',
-                    '09 Jan 2001',
-                    '10 Jan 2001',
-                    '11 Jan 2001',
-                    '12 Jan 2001',
+                    'Happiness',
+                    'Neurrality',
+                    'Anger',
+                    'Disgust',
+                    'Sadness',
+                    'Suprise',
+                    'Fear',
+                    'Contempt',
                 ],
                 xaxis: {
-                    type: 'datetime',
+                    type: 'string',
                 },
                 yaxis: [
                     {
                         title: {
-                            text: 'Website Blog',
-                        },
-                    },
-                    {
-                        opposite: true,
-                        title: {
-                            text: 'Social Media',
+                            text: 'Response',
                         },
                     },
                 ],
@@ -289,6 +262,17 @@ export default {
             recorder: null,
             isRecording: false,
             blob: null,
+            averages: [0, 0, 0, 0, 0, 0, 0, 0],
+            colors2: [
+                '#008FFB',
+                '#00E396',
+                '#FEB019',
+                '#FF4560',
+                '#775DD0',
+                '#546E7A',
+                '#26a69a',
+                '#D10CE8',
+            ],
         };
     },
     async beforeMount() {
@@ -302,15 +286,13 @@ export default {
     },
     mounted() {
         this.$store.watch(
-            function(state) {
-                return state.inSession;
-            },
+            state => state.inSession,
             () => {
                 console.log('STATE CHANGED', this.$store.state.inSession);
                 if (this.$store.state.inSession) {
                     this.$store.state.autoTimerId = setInterval(() => {
                         this.callBackend();
-                    }, 1000); //milliseconds
+                    }, 1000); // milliseconds
                 } else {
                     this.saveSessionToDB();
                 }
@@ -338,8 +320,8 @@ export default {
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             // Other browsers will fall back to image/png
-            var img = canvas.toDataURL('image/png');
-            console.log('Image taken!' + img);
+            const img = canvas.toDataURL('image/png');
+            console.log(`Image taken!${img}`);
         };
 
         // window.setInterval(this.addData(), 1000);
@@ -353,7 +335,7 @@ export default {
             const audio = await recorder.stop();
             audio.play();
             console.log('audio yo', audio);
-            var fd = new FormData();
+            const fd = new FormData();
             fd.append('fname', 'test.wav');
             fd.append('voice', audio.audioBlob);
             console.log('fd', fd);
@@ -385,22 +367,20 @@ export default {
                         mediaRecorder.start();
                     };
 
-                    const stop = () => {
-                        return new Promise(resolve => {
+                    const stop = () =>
+                        new Promise(resolve => {
                             mediaRecorder.addEventListener('stop', () => {
-                                const audioBlob = new Blob(audioChunks);
+                                const audioBlob = new Blob(audioChunks, { type: 'audio/wav;' });
                                 const audioUrl = URL.createObjectURL(audioBlob);
                                 const audio = new Audio(audioUrl);
                                 const play = () => {
                                     audio.play();
                                 };
-
                                 resolve({ audioBlob, audioUrl, play });
                             });
 
                             mediaRecorder.stop();
                         });
-                    };
 
                     resolve({ start, stop });
                 });
@@ -430,27 +410,27 @@ export default {
         },
         stopRecording() {
             console.log('stopButton clicked');
-            //tell the recorder to stop the recording
+            // tell the recorder to stop the recording
             this.rec.stop();
-            //stop microphone access
+            // stop microphone access
             this.gumStream.getAudioTracks()[0].stop();
-            //create the wav blob and pass it on to createDownloadLink
+            // create the wav blob and pass it on to createDownloadLink
             this.voice = this.rec.exportWAV;
         },
         startRecording() {
             this.AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.audioContext = new AudioContext(); //new audio context to help us record
+            this.audioContext = new AudioContext(); // new audio context to help us record
 
             console.log('recordButton clicked');
-            let constraints = { audio: true, video: false };
-            let parent = this;
+            const constraints = { audio: true, video: false };
+            const parent = this;
             navigator.mediaDevices
                 .getUserMedia(constraints)
                 .then(stream => {
                     console.log(
                         'getUserMedia() success, stream created, initializing Recorder.js ...'
                     );
-                    //update the format
+                    // update the format
                     /*  assign to gumStream for later use  */
                     try {
                         parent.gumStream = stream;
@@ -458,19 +438,19 @@ export default {
                         console.log(parent.gumStream);
                         parent.rec = new Recorder(parent.input, { numChannels: 1 });
                         console.log('Recorder Made');
-                        //start the recording process
+                        // start the recording process
                         parent.rec.record();
                         console.log('Recording started');
                     } catch (err) {
                         console.log('Gum error', err);
                     }
                     /* use the stream */
-                    /* 
+                    /*
                 Create the Recorder object and configure to record mono sound (1 channel)
                 Recording 2 channels  will double the file size
             */
                 })
-                .catch(function(err) {});
+                .catch(err => {});
         },
         async newFirebaseSession() {
             try {
@@ -502,12 +482,12 @@ export default {
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             // Other browsers will fall back to image/png
-            var img = canvas.toDataURL('image/png');
-            var blob = this.dataURItoBlob(img);
-            var fd = new FormData();
+            const img = canvas.toDataURL('image/png');
+            const blob = this.dataURItoBlob(img);
+            const fd = new FormData();
             fd.append('audience_image', blob);
 
-            let data = new FormData();
+            const data = new FormData();
             data.append('audience_image', img, 'myimage1');
             console.log('data', data);
             try {
@@ -529,6 +509,16 @@ export default {
             this.series[0].data.push(Math.floor(Math.random() * 100));
             this.series[0].data.shift();
             this.options.xaxis.categories.shift();
+        },
+        computeAverageEmotions() {
+            this.averageChart.series[0].data[0] += this.azureResponse.anger;
+            this.averageChart.series[0].data[1] += this.azureResponse.neutral;
+            this.averageChart.series[0].data[2] += this.azureResponse.anger;
+            this.averageChart.series[0].data[3] += this.azureResponse.disgust;
+            this.averageChart.series[0].data[4] += this.azureResponse.sadness;
+            this.averageChart.series[0].data[5] += this.azureResponse.surprise;
+            this.averageChart.series[0].data[6] += this.azureResponse.fear;
+            this.averageChart.series[0].data[7] += this.azureResponse.contempt;
         },
         updateAzureData() {
             console.log('EMOO', this.azureResponse.neutral);
@@ -565,7 +555,7 @@ export default {
                 this.azureResponse.fear,
                 this.azureResponse.contempt,
             ];
-
+            this.computeAverageEmotions();
             // this.series[0].data.shift();
             // this.options.xaxis.categories.shift();
         },
@@ -578,58 +568,58 @@ export default {
         },
         dataURItoBlob(dataURI) {
             // convert base64/URLEncoded data component to raw binary data held in a string
-            var byteString;
-            if (dataURI.split(',')[0].indexOf('base64') >= 0)
+            let byteString;
+            if (dataURI.split(',')[0].indexOf('base64') >= 0) {
                 byteString = atob(dataURI.split(',')[1]);
-            else byteString = unescape(dataURI.split(',')[1]);
+            } else byteString = unescape(dataURI.split(',')[1]);
 
             // separate out the mime component
-            var mimeString = dataURI
+            const mimeString = dataURI
                 .split(',')[0]
                 .split(':')[1]
                 .split(';')[0];
 
             // write the bytes of the string to a typed array
-            var ia = new Uint8Array(byteString.length);
-            for (var i = 0; i < byteString.length; i++) {
+            const ia = new Uint8Array(byteString.length);
+            for (let i = 0; i < byteString.length; i++) {
                 ia[i] = byteString.charCodeAt(i);
             }
 
             return new Blob([ia], { type: mimeString });
         },
         timeStrToSecs(timein) {
-            let a = timein.split(':'); // split it at the colons
+            const a = timein.split(':'); // split it at the colons
             // minutes are worth 60 seconds. Hours are worth 60 minutes.
-            let seconds = +a[0] * 60 * 60 + +a[1] * 60 + +a[2];
+            const seconds = +a[0] * 60 * 60 + +a[1] * 60 + +a[2];
             return seconds;
         },
         visiualizeAudio() {
-            var paths = document.getElementById('aud').getElementsByTagName('path');
-            var visualizer = document.getElementById('visualizer');
-            var mask = visualizer.getElementById('mymask');
-            var h = document.getElementsByTagName('h1')[0];
-            var path;
-            var report = 0;
+            const paths = document.getElementById('aud').getElementsByTagName('path');
+            const visualizer = document.getElementById('visualizer');
+            const mask = visualizer.getElementById('mymask');
+            const h = document.getElementsByTagName('h1')[0];
+            let path;
+            const report = 0;
             console.log('suhhhhhhhhh', paths);
-            var soundAllowed = function(stream) {
-                //Audio stops listening in FF without // window.persistAudioStream = stream;
-                //https://bugzilla.mozilla.org/show_bug.cgi?id=965483
-                //https://support.mozilla.org/en-US/questions/984179
+            const soundAllowed = function(stream) {
+                // Audio stops listening in FF without // window.persistAudioStream = stream;
+                // https://bugzilla.mozilla.org/show_bug.cgi?id=965483
+                // https://support.mozilla.org/en-US/questions/984179
                 window.persistAudioStream = stream;
                 h.innerHTML = 'Thanks';
                 h.setAttribute('style', 'opacity: 0;');
-                var audioContent = new AudioContext();
-                var audioStream = audioContent.createMediaStreamSource(stream);
-                var analyser = audioContent.createAnalyser();
+                const audioContent = new AudioContext();
+                const audioStream = audioContent.createMediaStreamSource(stream);
+                const analyser = audioContent.createAnalyser();
                 audioStream.connect(analyser);
                 analyser.fftSize = 1024;
 
-                var frequencyArray = new Uint8Array(analyser.frequencyBinCount);
+                const frequencyArray = new Uint8Array(analyser.frequencyBinCount);
                 visualizer.setAttribute('viewBox', '0 0 255 255');
 
-                //Through the frequencyArray has a length longer than 255, there seems to be no
-                //significant data after this point. Not worth visualizing.
-                for (var i = 0; i < 255; i++) {
+                // Through the frequencyArray has a length longer than 255, there seems to be no
+                // significant data after this point. Not worth visualizing.
+                for (let i = 0; i < 255; i++) {
                     path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     path.setAttribute('stroke-dasharray', '4,1');
                     mask.appendChild(path);
@@ -637,27 +627,27 @@ export default {
                 var doDraw = function() {
                     requestAnimationFrame(doDraw);
                     analyser.getByteFrequencyData(frequencyArray);
-                    var adjustedLength;
-                    for (var i = 0; i < 255; i++) {
+                    let adjustedLength;
+                    for (let i = 0; i < 255; i++) {
                         adjustedLength =
                             Math.floor(frequencyArray[i]) - Math.floor(frequencyArray[i]) % 5;
-                        paths[i].setAttribute('d', 'M ' + i + ',255 l 0,-' + adjustedLength);
+                        paths[i].setAttribute('d', `M ${i},255 l 0,-${adjustedLength}`);
                     }
                 };
                 doDraw();
             };
 
-            var soundNotAllowed = function(error) {
+            const soundNotAllowed = function(error) {
                 h.innerHTML = 'You must allow your microphone.';
                 console.log(error);
             };
 
-            /*window.navigator = window.navigator || {};
+            /* window.navigator = window.navigator || {};
     /*navigator.getUserMedia =  navigator.getUserMedia       ||
                               navigator.webkitGetUserMedia ||
                               navigator.mozGetUserMedia    ||
-                              null;*/
-            //navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
+                              null; */
+            // navigator.getUserMedia({ audio: true }, soundAllowed, soundNotAllowed);
         },
     },
 };
@@ -721,5 +711,10 @@ h1 a {
     stroke-linecap: square;
     stroke: white;
     stroke-width: 0.5px;
+}
+
+.iOdometer {
+    font-size: 2em;
+    margin: 0;
 }
 </style>

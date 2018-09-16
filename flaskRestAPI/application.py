@@ -260,9 +260,9 @@ def api_audio():
         AUDIO_FILE = audio
         # use audio file as the audio source
         r = sr.Recognizer()
-        with sr.AudioFile(AUDIO_FILE) as source:
-            audio = r.record(source)  # read the entire audio file
-
+        # with sr.AudioFile(AUDIO_FILE) as source:
+        #     audio = r.record(source)  # read the entire audio file
+        audio = AUDIO_FILE
         # STT Microsoft Bing Voice Recognition
         BING_KEY = "2e41739b91bf4b6e84ad1aa4e9a6030d"
 
