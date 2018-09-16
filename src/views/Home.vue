@@ -242,6 +242,10 @@ export default {
                     data: [0],
                 },
             ],
+            persistantData: {
+                engagementChart: { x: [], y: [] },
+                emotionalBreakdown: { labels: [], sets: [] },
+            },
         };
     },
     async beforeMount() {
@@ -264,12 +268,14 @@ export default {
                     this.$store.state.autoTimerId = setInterval(() => {
                         this.callBackend();
                     }, 1000); //milliseconds
+                } else {
+                    this.saveSessionToDB();
                 }
             }
         );
 
         this.visiualizeAudio();
-        this.newFirebaseSession();
+        //this.newFirebaseSession();
         const video = document.querySelector('#videoElement');
 
         if (navigator.mediaDevices.getUserMedia) {
@@ -397,7 +403,18 @@ export default {
                 const response = await db
                     .collection('sessions')
                     .doc((new Date() * 1000).toString())
-                    .set({ suhbruh: 'ssss' });
+                    .set(this.persistantData);
+                console.log('fb success');
+            } catch (err) {
+                console.log('Error updating firebase: ', err);
+            }
+        },
+        async saveSessionToDB() {
+            try {
+                const response = await db
+                    .collection('sessions')
+                    .doc((new Date() * 1000).toString())
+                    .set(this.persistantData);
                 console.log('fb success');
             } catch (err) {
                 console.log('Error updating firebase: ', err);
@@ -443,7 +460,30 @@ export default {
         updateAzureData() {
             console.log('foewuhfuiwe');
             console.log('EMOO', this.azureResponse.neutral);
+            this.persistantData.engagementChart.y.push(this.azureResponse.total_ppl);
+            this.persistantData.engagementChart.x.push(
+                this.timeStrToSecs(this.$store.state.timeElapsed)
+            );
+            this.persistantData.emotionalBreakdown.labels = [
+                'Anger',
+                'Contempt',
+                'Disgust',
+                'Fear',
+                'Neutral',
+            ];
+            this.persistantData.emotionalBreakdown.sets.push([
+                this.azureResponse.anger,
+                this.azureResponse.contempt,
+                this.azureResponse.disgust,
+                this.azureResponse.fear,
+                this.azureResponse.neutral,
+            ]);
+            this.options.xaxis.categories.push(this.timeStrToSecs(this.$store.state.timeElapsed));
             this.series[0].data.push(this.azureResponse.total_ppl);
+            if (this.options.xaxis.categories.length > 20) {
+                this.options.xaxis.categories.shift();
+                this.series[0].data.shift();
+            }
             this.emotionNew.series = [
                 this.azureResponse.anger,
                 this.azureResponse.contempt,
@@ -482,6 +522,12 @@ export default {
             }
 
             return new Blob([ia], { type: mimeString });
+        },
+        timeStrToSecs(timein) {
+            let a = timein.split(':'); // split it at the colons
+            // minutes are worth 60 seconds. Hours are worth 60 minutes.
+            let seconds = +a[0] * 60 * 60 + +a[1] * 60 + +a[2];
+            return seconds;
         },
         visiualizeAudio() {
             var paths = document.getElementById('aud').getElementsByTagName('path');
