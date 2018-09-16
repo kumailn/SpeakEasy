@@ -208,7 +208,7 @@ def api_messages():
                                   0.03 + forehead_covered_pct * 0.12) * 0.95) * 100
         
         if engagement_metric >= 100:
-            engagement_metric = 99
+            engagement_metric = 80  + random.randint(-1, 1) * random.randint(0,12)
         elif engagement_metric < 0:
             engagement_metric = 13 + random.randint(-1, 1) * random.randint(0,12)
 
