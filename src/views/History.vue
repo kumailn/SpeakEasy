@@ -1,4 +1,5 @@
 <template>
+<div style="background-image: linear-gradient(#c6ffdd, #fbd786, #f7797d);">
   <v-container fluid>
     <v-container grid-list-md text-xs-center>
       <v-layout row wrap>
@@ -69,6 +70,7 @@
 
     </v-slide-y-transition>
   </v-container>
+  </div>
 </template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
