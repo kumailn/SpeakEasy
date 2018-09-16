@@ -41,7 +41,7 @@
         <v-flex xs4>
           <v-card>
             <v-card-text class="px-0">
-              <apexcharts width="100%" type="radialBar" :options="emotionNew" :series="emotionNew.series" height="400px" />
+              <apexcharts width="100%" type="pie" :options="emotionNew" :series="emotionNew.series" height="100%" />
             </v-card-text>
           </v-card>
         </v-flex>
