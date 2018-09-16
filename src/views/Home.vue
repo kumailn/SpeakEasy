@@ -8,7 +8,7 @@
           </v-card>
         </v-flex>
         <v-flex xs4>
-          <v-card id="aud">
+          <v-card id="aud" >
             <svg preserveAspectRatio="none" id="visualizer" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
               <defs>
                 <mask id="mymask">
@@ -41,7 +41,7 @@
         <v-flex xs4>
           <v-card>
             <v-card-text class="px-0">
-              <apexcharts width="100%" type="pie" :options="emotionNew" :series="emotionNew.series" height="100%" />
+              <apexcharts width="100%" type="pie" :options="emotionNew" :series="emotionNew.series" height="390px" />
             </v-card-text>
           </v-card>
         </v-flex>
