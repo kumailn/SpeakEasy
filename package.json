@@ -13,6 +13,7 @@
     "firebase": "^5.5.0",
     "mime": "^2.3.1",
     "recorder-js": "^1.0.7",
+    "recorder.js": "^1.2.2",
     "recorderjs": "^1.0.1",
     "vue": "^2.5.17",
     "vue-apexcharts": "^1.1.1",
