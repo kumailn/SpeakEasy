@@ -9,8 +9,28 @@
             </v-card>
           </v-flex>
           <v-flex xs4>
-            <v-card id="aud">
-              <IOdometer class="iOdometer" :value="totalNumPeople" />
+            <v-card id="aud" style="height: 100%;">
+              <div>
+                <h2 style="padding-bottom: 5%; font-weight: bold;">Audience Statistics</h2>
+                <h3>Total People:
+                </h3>
+                <IOdometer class="iOdometer" :value="totalNumPeople" />
+                <br/>
+                <br/>
+                <h3>Total % Smiling:</h3>
+                <IOdometer class="iOdometer" :value="smiles" />
+                <br/>
+                <br/>
+                <h3>Average Estimated Age:</h3>
+                <IOdometer class="iOdometer" :value="avgAge" />
+                <br/>
+                <h3>% Male:</h3>
+                <IOdometer class="iOdometer" :value="numMales" />
+                <br/>
+                <h3>% Female:</h3>
+                <IOdometer class="iOdometer" :value="numMales" />
+
+              </div>
             </v-card>
           </v-flex>
           <v-flex xs4>
@@ -65,6 +85,10 @@ export default {
     },
     data() {
         return {
+            numFemales: 0,
+            numMales: 0,
+            avgAge: 0,
+            smiles: 0,
             totalNumPeople: 15,
             emoteBar: {
                 chart: {
@@ -543,7 +567,12 @@ export default {
                 this.azureResponse.fear,
                 this.azureResponse.contempt,
             ];
+            this.smiles = Math.round(this.azureResponse.smiles_incrowd_pct);
             this.totalNumPeople = Math.round(this.azureResponse.total_ppl);
+            this.avgAge = Math.round(this.azureResponse.avg_age_incrowd);
+            this.numMales = Math.round(this.azureResponse.males_incrowd_pct);
+            this.numFemales = 100 - Math.round(this.azureResponse.males_incrowd_pct);
+
             this.computeAverageEmotions();
             // this.series[0].data.shift();
             // this.options.xaxis.categories.shift();

@@ -234,93 +234,6 @@ def api_messages():
 @app.route('/audio', methods=['GET'])
 def api_audio():
 
-<<<<<<< HEAD
-    if 'voice' in request.files:
-        f = request.files['voice']
-        name = "output.wav"
-        audio = wave.open(name, 'wb')
-        audio.setnchannels(1)
-        audio.setsampwidth(2)
-        audio.setframerate(8000)
-        audio.setnframes(100)
-
-        blob = f.read()  # such as `blob.read()`
-        audio.writeframes(blob)
-
-        # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
-        # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "girl_filler1.wav")
-        #AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
-        AUDIO_FILE = audio
-        # use audio file as the audio source
-        r = sr.Recognizer()
-        # with sr.AudioFile(AUDIO_FILE) as source:
-        #     audio = r.record(source)  # read the entire audio file
-        audio = AUDIO_FILE
-        # STT Microsoft Bing Voice Recognition
-        BING_KEY = "2e41739b91bf4b6e84ad1aa4e9a6030d"
-
-        # STT and preprocessing
-        raw = r.recognize_bing(audio, key=BING_KEY)
-        print(raw)
-        text = raw.split()
-        text = [k.lower() for k in text]
-        print(text)
-
-        text_non_replaced = copy.deepcopy(text)
-
-        # filler word corpus; to be expanded or collapsed
-        filler_words = ['uh', 'ah', 'like', 'gonna',
-                        'hopefully', 'ok', 'basically', 'pretty', 'just', 'so']
-
-        for n, i in enumerate(text):
-            if i in filler_words:
-                text[n] = '-FILLER-'
-        print(text)
-
-        total_fillers = filling_words(text)
-        total_words = len(text)
-        # likes = filling_words(preprocessed, 'like') #<-- inaccurate
-        print('pct of fillers said: ', total_fillers,
-              ' out of ', total_words, ' words.')
-
-        like_fillers = filling_words(text_non_replaced, 'like')
-        print('pct of "like"s said: ', like_fillers)
-
-        um_fillers = filling_words(text_non_replaced, 'um')
-        print('pct of "um"s said: ', um_fillers)
-
-        uh_fillers = filling_words(text_non_replaced, 'uh')
-        print('pct of "uh"s said: ', uh_fillers)
-
-        so_fillers = filling_words(text_non_replaced, 'so')
-        print('pct of "so"s said: ', so_fillers)
-
-        but_fillers = filling_words(text_non_replaced, 'but')
-        print('pct of "but"s said: ', but_fillers)
-
-        basically_fillers = filling_words(text_non_replaced, 'basically')
-        print('pct of "basically"s said: ', basically_fillers)
-
-        gonna_fillers = filling_words(text_non_replaced, 'ghana')
-        print('pct of "gonna"s said: ', gonna_fillers)
-
-        data2 = {}
-        data2['transcript'] = raw
-        data2['num_of_words'] = total_words
-        data2['total_fillers'] = total_fillers
-        data2['like_fillers'] = like_fillers
-        data2['um_fillers'] = um_fillers
-        data2['uh_fillers'] = uh_fillers
-        data2['so_fillers'] = so_fillers
-        data2['but_fillers'] = but_fillers
-        data2['basically_fillers'] = basically_fillers
-        data2['gonna_fillers'] = gonna_fillers
-
-        json_data = json.dumps(data2)
-
-        return json_data
-        return "ECHO: POSTED\n"
-=======
     # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
     # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "girl_filler1.wav")
     #AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
@@ -394,7 +307,6 @@ def api_audio():
 
     return json_data
     return "ECHO: POSTED\n"
->>>>>>> a8ecafe0274a81b229522b52c29f4fc3ec5e589f
 
 
 if __name__ == '__main__':
