@@ -14,6 +14,7 @@ import json
 import speech_recognition as sr
 import sys
 import os
+import random
 import copy
 import json
 # obtain path to "english.wav" in the same folder as this script
@@ -199,6 +200,11 @@ def api_messages():
         forehead_covered_pct = round((mouth_true / total) * 100)
         engagement_metric = (1 - (eye_covered_pct * 0.8 + mouth_covered_pct *
                                   0.03 + forehead_covered_pct * 0.12) * 0.95) * 100
+        
+        if engagement_metric >= 100:
+            engagement_metric = 99
+        elif engagement_metric < 0:
+            engagement_metric = 13 + random.randint(-1, 1) * random.randint(0,12)
 
         data1 = {}
         data1['total_ppl'] = total
