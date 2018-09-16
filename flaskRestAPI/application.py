@@ -23,6 +23,34 @@ from os import path
 app = Flask(__name__)
 CORS(app)
 
+def compare_to_standard(percent, standard):
+    ''' takes in the percentage of the user's usage of filler
+        words and compares it with the TED Talk standard
+    '''
+    if percent < standard:
+        print('Used few uh-um-likes')
+    else:
+        print('More uh-um-likes than intended')
+
+def filling_words(segments, filler='-FILLER-'):
+    ''' takes in list of segments and an optional parameter as 
+        the filler word to search for
+    '''
+    
+    if not filler == '-FILLER-':
+        filler = filler.lower()
+        
+    num_filler = segments.count(filler)
+    total_words = len(segments)
+    #print('total_words:', total_words)
+    if filler == '-FILLER-':
+        filler = 'um or uh' # for better printing in the results
+    #print('number of ', filler,'said:', num_filler)
+    percent = num_filler/total_words
+    #print('percent of filler words', percent)
+    #print('compared to TED standard frequency of filler words (0.005589%)...')
+    compare_to_standard(percent, 0.005589) # gold standard is hard coded into the program right now
+    return percent
 
 @app.route('/xax')
 def api_root():
@@ -198,15 +226,15 @@ def api_messages():
     else:
         return "Error has occured"
 
-
 @app.route('/audio', methods=['POST'])
 def api_audio():
-    if request.method == 'POST':
+
+    if 'voice' in request.files:
+        f = request.files['voice']
         # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
         # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "girl_filler1.wav")
-        AUDIO_FILE = path.join(path.dirname(
-            path.realpath(__file__)), "filler-dave.wav")
-
+        #AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
+        AUDIO_FILE = f
         # use audio file as the audio source
         r = sr.Recognizer()
         with sr.AudioFile(AUDIO_FILE) as source:
@@ -218,13 +246,63 @@ def api_audio():
         # STT and preprocessing
         raw = r.recognize_bing(audio, key=BING_KEY)
         print(raw)
-        """ 
         text = raw.split()
         text = [k.lower() for k in text]
         print(text)
 
-        text_non_replaced = copy.deepcopy(text) """
+        text_non_replaced = copy.deepcopy(text)
+
+        # filler word corpus; to be expanded or collapsed
+        filler_words = ['uh', 'ah', 'like', 'gonna', 'hopefully', 'ok','basically', 'pretty', 'just', 'so']
+
+        for n, i in enumerate(text):
+            if i in filler_words:
+                text[n] = '-FILLER-'
+        print(text)
+
+        total_fillers = filling_words(text)
+        total_words = len(text)
+        #likes = filling_words(preprocessed, 'like') #<-- inaccurate
+        print('pct of fillers said: ', total_fillers, ' out of ', total_words, ' words.')
+
+        like_fillers = filling_words(text_non_replaced, 'like')
+        print('pct of "like"s said: ',like_fillers)
+
+        um_fillers = filling_words(text_non_replaced, 'um')
+        print('pct of "um"s said: ', um_fillers)
+
+        uh_fillers = filling_words(text_non_replaced, 'uh')
+        print('pct of "uh"s said: ', uh_fillers)
+
+        so_fillers = filling_words(text_non_replaced, 'so')
+        print('pct of "so"s said: ', so_fillers)
+
+        but_fillers = filling_words(text_non_replaced, 'but')
+        print('pct of "but"s said: ', but_fillers)
+
+        basically_fillers = filling_words(text_non_replaced, 'basically')
+        print('pct of "basically"s said: ', basically_fillers)
+
+        gonna_fillers = filling_words(text_non_replaced, 'ghana')
+        print('pct of "gonna"s said: ', gonna_fillers)
+
+        data2 = {}
+        data2['transcript'] = raw
+        data2['num_of_words'] = total_words
+        data2['total_fillers'] = total_fillers
+        data2['like_fillers'] = like_fillers
+        data2['um_fillers'] = um_fillers
+        data2['uh_fillers'] = uh_fillers
+        data2['so_fillers'] = so_fillers
+        data2['but_fillers'] = but_fillers
+        data2['basically_fillers'] = basically_fillers
+        data2['gonna_fillers'] = gonna_fillers
+
+        json_data = json.dumps(data2)
+
+        return json_data
         return "ECHO: POSTED\n"
+
 
 
 if __name__ == '__main__':
