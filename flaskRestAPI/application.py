@@ -133,8 +133,9 @@ def api_messages():
             else:
                 forehead_true += 1
 
-        total = (anger + contempt + disgust + fear + \
-            happiness + neutral + sadness + surprise) + 0.001
+        total = (anger + contempt + disgust + fear + happiness + neutral + sadness + surprise)
+        if(total == 0): total = 1
+
 
         anger_pct = anger / total * 100
         contempt_pct = contempt / total * 100
