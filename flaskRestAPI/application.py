@@ -20,9 +20,12 @@ import json
 # obtain path to "english.wav" in the same folder as this script
 from os import path
 
+import wave
+
 
 app = Flask(__name__)
 CORS(app)
+
 
 def compare_to_standard(percent, standard):
     ''' takes in the percentage of the user's usage of filler
@@ -33,25 +36,28 @@ def compare_to_standard(percent, standard):
     else:
         print('More uh-um-likes than intended')
 
+
 def filling_words(segments, filler='-FILLER-'):
     ''' takes in list of segments and an optional parameter as 
         the filler word to search for
     '''
-    
+
     if not filler == '-FILLER-':
         filler = filler.lower()
-        
+
     num_filler = segments.count(filler)
     total_words = len(segments)
     #print('total_words:', total_words)
     if filler == '-FILLER-':
-        filler = 'um or uh' # for better printing in the results
+        filler = 'um or uh'  # for better printing in the results
     #print('number of ', filler,'said:', num_filler)
     percent = num_filler/total_words
     #print('percent of filler words', percent)
     #print('compared to TED standard frequency of filler words (0.005589%)...')
-    compare_to_standard(percent, 0.005589) # gold standard is hard coded into the program right now
+    # gold standard is hard coded into the program right now
+    compare_to_standard(percent, 0.005589)
     return percent
+
 
 @app.route('/xax')
 def api_root():
@@ -232,15 +238,26 @@ def api_messages():
     else:
         return "Error has occured"
 
+
 @app.route('/audio', methods=['POST'])
 def api_audio():
 
     if 'voice' in request.files:
         f = request.files['voice']
+        name = "output.wav"
+        audio = wave.open(name, 'wb')
+        audio.setnchannels(1)
+        audio.setsampwidth(2)
+        audio.setframerate(8000)
+        audio.setnframes(100)
+
+        blob = f.read()  # such as `blob.read()`
+        audio.writeframes(blob)
+
         # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
         # AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "girl_filler1.wav")
         #AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "english.wav")
-        AUDIO_FILE = f
+        AUDIO_FILE = audio
         # use audio file as the audio source
         r = sr.Recognizer()
         with sr.AudioFile(AUDIO_FILE) as source:
@@ -259,7 +276,8 @@ def api_audio():
         text_non_replaced = copy.deepcopy(text)
 
         # filler word corpus; to be expanded or collapsed
-        filler_words = ['uh', 'ah', 'like', 'gonna', 'hopefully', 'ok','basically', 'pretty', 'just', 'so']
+        filler_words = ['uh', 'ah', 'like', 'gonna',
+                        'hopefully', 'ok', 'basically', 'pretty', 'just', 'so']
 
         for n, i in enumerate(text):
             if i in filler_words:
@@ -268,11 +286,12 @@ def api_audio():
 
         total_fillers = filling_words(text)
         total_words = len(text)
-        #likes = filling_words(preprocessed, 'like') #<-- inaccurate
-        print('pct of fillers said: ', total_fillers, ' out of ', total_words, ' words.')
+        # likes = filling_words(preprocessed, 'like') #<-- inaccurate
+        print('pct of fillers said: ', total_fillers,
+              ' out of ', total_words, ' words.')
 
         like_fillers = filling_words(text_non_replaced, 'like')
-        print('pct of "like"s said: ',like_fillers)
+        print('pct of "like"s said: ', like_fillers)
 
         um_fillers = filling_words(text_non_replaced, 'um')
         print('pct of "um"s said: ', um_fillers)
@@ -308,7 +327,6 @@ def api_audio():
 
         return json_data
         return "ECHO: POSTED\n"
-
 
 
 if __name__ == '__main__':
