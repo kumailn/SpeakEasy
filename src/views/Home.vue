@@ -1,65 +1,50 @@
 <template>
-<div style="background-image: linear-gradient(#c6ffdd, #fbd786, #f7797d);">
-  <v-container fluid>
-    <v-container grid-list-md text-xs-center>
-      <v-layout row wrap>
-        <v-flex xs8>
-          <v-card>
-            <apexcharts width="100%" type="area" :options="options" :series="series" height="400px"></apexcharts>
-          </v-card>
-        </v-flex>
-        <v-flex xs4>
-          <v-card id="aud">
-            <IOdometer class="iOdometer" :value="totalNumPeople" />
-          </v-card>
-        </v-flex>
-        <v-flex xs4>
-          <v-card dark color="secondary">
-            <div id="container">
-              <video autoplay="true" id="videoElement" style="width: 100%; height: 100%;" />
-            </div>
-            <button id="screenshotButton"> Take a Screenshot </button>
-            <br>
-            <button id="recordButton" @click="startRec1"> Record </button> <br>
-            <button id="stopButton" @click="stopR"> Stop </button>
-          </v-card>
-        </v-flex>
-        <v-flex xs4>
-          <v-card>
-            <v-card-text class="px-0">
-              <apexcharts width="100%" type="bar" :options="emoteBar" :series="emoteBar.series" height="400px" />
-            </v-card-text>
-          </v-card>
-        </v-flex>
-        <v-flex xs4>
-          <v-card>
-            <v-card-text class="px-0">
-              <apexcharts width="100%" type="line" :options="averageChart" :series="averageChart.series" height="400px" />
-            </v-card-text>
-          </v-card>
-        </v-flex>
-        <v-flex v-for="i in 4 " :key="`3${i}` " xs3>
-          <v-card dark color="secondary ">
-            <v-card-text class="px-0 ">3</v-card-text>
-          </v-card>
-        </v-flex>
-        <v-flex v-for="i in 6 " :key="`2${i}` " xs2>
-          <v-card dark color="primary ">
-            <v-card-text class="px-0 ">2</v-card-text>
-          </v-card>
-        </v-flex>
-        <v-flex v-for="i in 12 " :key="`1${i}` " xs1>
-          <v-card dark color="secondary ">
-            <v-card-text class="px-0 ">1</v-card-text>
-          </v-card>
-        </v-flex>
-      </v-layout>
+  <div style="background-image: linear-gradient(#c6ffdd, #fbd786, #f7797d);">
+    <v-container fluid>
+      <v-container grid-list-md text-xs-center>
+        <v-layout row wrap>
+          <v-flex xs8>
+            <v-card>
+              <apexcharts width="100%" type="area" :options="options" :series="series" height="400px"></apexcharts>
+            </v-card>
+          </v-flex>
+          <v-flex xs4>
+            <v-card id="aud">
+              <IOdometer class="iOdometer" :value="totalNumPeople" />
+            </v-card>
+          </v-flex>
+          <v-flex xs4>
+            <v-card dark color="secondary">
+              <div id="container">
+                <video autoplay="true" id="videoElement" style="width: 100%; height: 100%;" />
+              </div>
+              <button id="screenshotButton"> Take a Screenshot </button>
+              <br>
+              <button id="recordButton" @click="startRec1"> Record </button> <br>
+              <button id="stopButton" @click="stopR"> Stop </button>
+            </v-card>
+          </v-flex>
+          <v-flex xs4>
+            <v-card>
+              <v-card-text class="px-0">
+                <apexcharts width="100%" type="bar" :options="emoteBar" :series="emoteBar.series" height="400px" />
+              </v-card-text>
+            </v-card>
+          </v-flex>
+          <v-flex xs4>
+            <v-card>
+              <v-card-text class="px-0">
+                <apexcharts width="100%" type="line" :options="averageChart" :series="averageChart.series" height="400px" />
+              </v-card-text>
+            </v-card>
+          </v-flex>
+        </v-layout>
+      </v-container>
+
+      <v-slide-y-transition mode="out-in ">
+
+      </v-slide-y-transition>
     </v-container>
-
-    <v-slide-y-transition mode="out-in ">
-
-    </v-slide-y-transition>
-  </v-container>
   </div>
 </template>
 
@@ -71,6 +56,7 @@ import FormData from 'form-data';
 import axios from 'axios';
 import db from '../private';
 import IOdometer from 'vue-odometer';
+import 'odometer/themes/odometer-theme-default.css';
 
 export default {
     components: {
@@ -79,7 +65,7 @@ export default {
     },
     data() {
         return {
-            totalNumPeople: 2,
+            totalNumPeople: 15,
             emoteBar: {
                 chart: {
                     height: 380,
@@ -342,7 +328,7 @@ export default {
             fd.append('voice', audio.audioBlob);
             console.log('fd', fd);
             try {
-                const response = await axios.post('http://127.0.0.1:5000/audio', fd, {
+                const response = await axios.get('http://127.0.0.1:5000/audio', {
                     headers: {
                         accept: 'application/json',
                         'Accept-Language': 'en-US,en;q=0.8',
@@ -557,6 +543,7 @@ export default {
                 this.azureResponse.fear,
                 this.azureResponse.contempt,
             ];
+            this.totalNumPeople = Math.round(this.azureResponse.total_ppl);
             this.computeAverageEmotions();
             // this.series[0].data.shift();
             // this.options.xaxis.categories.shift();
@@ -672,7 +659,7 @@ a {
     color: #42b983;
 }
 
-#aud {
+#audh {
     width: 100%;
     height: 100%;
     padding: 0;
