@@ -5783,6 +5783,10 @@ recorder-js@^1.0.7:
   dependencies:
     inline-worker "^1.1.0"
 
+recorder.js@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/recorder.js/-/recorder.js-1.2.2.tgz#d62d01134976862ccbf3f35c0b5dc2d0181600df"
+
 recorderjs@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/recorderjs/-/recorderjs-1.0.1.tgz#f8211a0f90bdcdcfa2f431a597b6cb94a1b93571"
