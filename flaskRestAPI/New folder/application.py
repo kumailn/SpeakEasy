@@ -1,15 +1,14 @@
 from flask import Flask, url_for
 from flask import request
 import requests
-from flask_cors import CORS
 # If you are using a Jupyter notebook, uncomment the following line.
 # %matplotlib inline
 from PIL import Image
 from io import BytesIO
 import json
 
+
 app = Flask(__name__)
-CORS(app)
 
 
 @app.route('/xax')
@@ -21,7 +20,7 @@ def api_root():
 def api_messages():
     if 'audience_image' in request.files:
         f = request.files['audience_image']
-        f.save(f.filename)
+        f.save("test"+f.filename)
 
         # Replace <Subscription Key> with your valid subscription key.
         subscription_key = "3c2d9e603a9246aea14124b134560391"
@@ -133,8 +132,8 @@ def api_messages():
             else:
                 forehead_true += 1
 
-        total = (anger + contempt + disgust + fear + \
-            happiness + neutral + sadness + surprise) + 0.001
+        total = anger + contempt + disgust + fear + \
+            happiness + neutral + sadness + surprise
 
         anger_pct = anger / total * 100
         contempt_pct = contempt / total * 100

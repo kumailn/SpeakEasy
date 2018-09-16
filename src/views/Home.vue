@@ -79,6 +79,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <script>
 import VueApexCharts from 'vue-apexcharts';
+import FormData from 'form-data';
 import axios from 'axios';
 import db from '../private';
 
@@ -348,7 +349,31 @@ function createDownloadLink(blob) {
             }
         },
         async callBackend() {
-            const response = await axios.post('http://127.0.0.1:5000/messages');
+            const video = document.querySelector('#videoElement');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            // Other browsers will fall back to image/png
+            var img = canvas.toDataURL('image/png');
+            var blob = this.dataURItoBlob(img);
+            var fd = new FormData();
+            fd.append('audience_image', blob);
+
+            let data = new FormData();
+            data.append('audience_image', img, 'myimage1');
+            console.log('data', data);
+            try {
+                const response = await axios.post('http://127.0.0.1:5000/messages', fd, {
+                    headers: {
+                        accept: 'application/json',
+                        'Accept-Language': 'en-US,en;q=0.8',
+                    },
+                });
+                console.log('AI DATA: ', response.data);
+            } catch (err) {
+                console.log('Error with axios post file: ', err);
+            }
         },
         addData() {
             this.options.xaxis.categories.push(Math.floor(Math.random() * 100));
@@ -363,6 +388,27 @@ function createDownloadLink(blob) {
                 n.push(Math.floor(Math.random() * 100));
             }
             this.emotionBreakdown.series = n;
+        },
+        dataURItoBlob(dataURI) {
+            // convert base64/URLEncoded data component to raw binary data held in a string
+            var byteString;
+            if (dataURI.split(',')[0].indexOf('base64') >= 0)
+                byteString = atob(dataURI.split(',')[1]);
+            else byteString = unescape(dataURI.split(',')[1]);
+
+            // separate out the mime component
+            var mimeString = dataURI
+                .split(',')[0]
+                .split(':')[1]
+                .split(';')[0];
+
+            // write the bytes of the string to a typed array
+            var ia = new Uint8Array(byteString.length);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+
+            return new Blob([ia], { type: mimeString });
         },
         visiualizeAudio() {
             var paths = document.getElementById('aud').getElementsByTagName('path');
