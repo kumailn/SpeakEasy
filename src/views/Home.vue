@@ -571,7 +571,7 @@ export default {
             this.totalNumPeople = Math.round(this.azureResponse.total_ppl);
             this.avgAge = Math.round(this.azureResponse.avg_age_incrowd);
             this.numMales = Math.round(this.azureResponse.males_incrowd_pct);
-            this.numFemales = 100 - Math.round(this.azureResponse.males_incrowd_pct);
+            this.numFemales = Math.round(this.azureResponse.females_incrowd_pct);
 
             this.computeAverageEmotions();
             // this.series[0].data.shift();

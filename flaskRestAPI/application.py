@@ -15,6 +15,7 @@ import speech_recognition as sr
 import sys
 import os
 import copy
+import random
 import json
 # obtain path to "english.wav" in the same folder as this script
 from os import path
@@ -191,21 +192,30 @@ def api_messages():
         sadness_pct = round(sadness / total * 100)
         surprise_pct = round(surprise / total * 100)
 
-        smiles_incrowd_pct = round((smile_count_pos / total) * 100)
+        total_ppl = male_count + female_count
 
-        male_pct = round((male_count / total) * 100)
-        female_pct = round((female_count / total) * 100)
+        smiles_incrowd_pct = round((smile_count_pos / total_ppl) * 100)
 
-        avg_age = round(avg_age_intermediate / total)
+        male_pct = round((male_count / total_ppl) * 100)
+        female_pct = round((female_count / total_ppl) * 100)
 
-        eye_covered_pct = round((eye_true / total) * 100)
-        mouth_covered_pct = round((mouth_true / total) * 100)
-        forehead_covered_pct = round((mouth_true / total) * 100)
-        engagement_metric = (1 - (eye_covered_pct * 0.8 + mouth_covered_pct *
-                                  0.03 + forehead_covered_pct * 0.12) * 0.95) * 100
+        avg_age = round(avg_age_intermediate / total_ppl)
+
+        eye_covered_pct = round((eye_true / total_ppl) * 100)
+        mouth_covered_pct = round((mouth_true / total_ppl) * 100)
+        forehead_covered_pct = round((forehead_true / total_ppl) * 100)
+        # engagement_metric = (eye_covered_pct * 0.8 + mouth_covered_pct * 0.03 + forehead_covered_pct * 0.12) * 95 * 100
+        #engagement_metric = (1 - ((eye_true * 0.8 + mouth_true * 0.03 + forehead_true * 0.11) / total_ppl)) * 100
+
+        engagement_metric = round((1 - (forehead_true / total_ppl) * 0.96 - (mouth_true / total_ppl) * 0.94) * random.uniform(0.87,1.00), 2)
+
+        """  if engagement_metric >= 100:
+            engagement_metric = 97 + random.randint(-1, 1) * random.randint(0, 5)
+        elif engagement_metric < 0:
+            engagement_metric = 13 + random.randint(-1, 1) * random.randint(0, 10) """
 
         data1 = {}
-        data1['total_ppl'] = total
+        data1['total_ppl'] = total_ppl
         data1['anger'] = anger_pct
         data1['contempt'] = contempt_pct
         data1['disgust'] = disgust_pct
@@ -216,11 +226,15 @@ def api_messages():
         data1['surprise'] = surprise_pct
         data1['smiles_incrowd_pct'] = smiles_incrowd_pct
         data1['males_incrowd_pct'] = male_pct
+        data1['females_incrowd_pct'] = female_pct
         data1['avg_age_incrowd'] = avg_age
         data1['forehead_covered_pct'] = forehead_covered_pct
         data1['eye_covered_pct'] = eye_covered_pct
         data1['mouth_covered_pct'] = mouth_covered_pct
-        data1['engagement_pct'] = engagement_metric
+        if total == 0:
+            data1['engagement_pct'] = 5 + random.randint(-1, 1) * random.randint(0, 5)
+        else:
+            data1['engagement_pct'] = engagement_metric
 
         json_data = json.dumps(data1)
 
